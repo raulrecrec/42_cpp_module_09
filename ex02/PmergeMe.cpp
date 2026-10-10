@@ -6,7 +6,7 @@
 /*   By: rexposit <rexposit@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/10/08 20:08:34 by rexposit          #+#    #+#             */
-/*   Updated: 2026/10/10 15:01:30 by rexposit         ###   ########.fr       */
+/*   Updated: 2026/10/10 18:44:10 by rexposit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,6 +106,27 @@ void	PmergeMe::ford_johnson_vector(size_t group_size)
 	}
 
 	ford_johnson_vector(group_size * 2);
+}
+
+size_t	PmergeMe::binary_search_vector(int value, size_t end) const
+{
+	size_t	mid;
+	size_t	left;
+	size_t	right;
+
+	left = 0;
+	right = end;
+
+	while (left < right)
+	{
+		mid = left + (right - left) / 2;
+		if (value < vector[mid])
+			right = mid;
+		else
+			left = mid + 1;
+	}
+
+	return (left);
 }
 
 void	PmergeMe::parse_arguments(int argc, char **argv)
