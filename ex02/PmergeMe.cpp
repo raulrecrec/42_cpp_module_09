@@ -6,7 +6,7 @@
 /*   By: rexposit <rexposit@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/10/08 20:08:34 by rexposit          #+#    #+#             */
-/*   Updated: 2026/10/09 21:21:37 by rexposit         ###   ########.fr       */
+/*   Updated: 2026/10/10 15:01:30 by rexposit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,39 @@ int	PmergeMe::parse_number(const std::string &argument) const
 		throw std::runtime_error("Error");
 
 	return (static_cast<int>(value));
+}
+
+void	PmergeMe::swap_vector_groups(size_t first, size_t second, size_t group_size)
+{
+	int		aux;
+	size_t	i;
+
+	i = 0;
+	while (i < group_size)
+	{
+		aux = vector[first + i];
+		vector[first + i] = vector[second + i];
+		vector[second + i] = aux;
+		i++;
+	}
+}
+
+void	PmergeMe::ford_johnson_vector(size_t group_size)
+{
+	if (vector.size() < 2 * group_size)
+		return ;
+
+	size_t	i;
+
+	i = 0;
+	while (i + 2 * group_size <= vector.size())
+	{
+		if (vector[i + group_size - 1] > vector[i + 2 * group_size - 1])
+			swap_vector_groups(i, i + group_size, group_size);
+		i = i + 2 * group_size;
+	}
+
+	ford_johnson_vector(group_size * 2);
 }
 
 void	PmergeMe::parse_arguments(int argc, char **argv)
