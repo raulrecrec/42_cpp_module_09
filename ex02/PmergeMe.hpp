@@ -6,7 +6,7 @@
 /*   By: rexposit <rexposit@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/10/08 20:08:37 by rexposit          #+#    #+#             */
-/*   Updated: 2026/10/13 05:18:50 by rexposit         ###   ########.fr       */
+/*   Updated: 2026/10/13 22:13:41 by rexposit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ class	PmergeMe
 		PmergeMe	&operator=(const PmergeMe &other);
 		~PmergeMe();
 
-		size_t	binary_search_vector(int value, size_t end) const;
+		size_t	binary_search_vector(const std::vector<int> &chain, int value, size_t end, size_t group_size) const;
 		void	parse_arguments(int argc, char ** argv);
 		void	print_vector_deque() const;
 };
