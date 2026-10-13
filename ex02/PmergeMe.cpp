@@ -6,7 +6,7 @@
 /*   By: rexposit <rexposit@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/10/08 20:08:34 by rexposit          #+#    #+#             */
-/*   Updated: 2026/10/13 06:03:45 by rexposit         ###   ########.fr       */
+/*   Updated: 2026/10/13 23:11:18 by rexposit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,6 +150,36 @@ void	PmergeMe::build_main_chain_vector(size_t group_size)
 		leftover.push_back(vector[i]);
 		i++;
 	}
+
+	size_t	end;
+	size_t	position;
+	bool	found;
+
+	i = 0;
+	while (i < pending.size())
+	{
+		j = 0;
+		found = false;
+		end = main_chain.size() / group_size;
+		if (pending[i].has_partner)
+		{
+			while (j < main_chain.size())
+			{
+				if (main_chain[j + group_size - 1] == pending[i].partner)
+				{
+					end = j / group_size;
+					found = true;
+					break ;
+				}
+				j = j + group_size;
+			}
+			if (!found)
+				throw std::logic_error("Partner group not found");
+		}
+		position = binary_search_vector(main_chain, pending[i].group[group_size - 1], end, group_size);
+		main_chain.insert(main_chain.begin() + position * group_size, pending[i].group.begin(), pending[i].group.end());
+		i++;
+	}
 }
 
 void	PmergeMe::ford_johnson_vector(size_t group_size)
@@ -171,7 +201,7 @@ void	PmergeMe::ford_johnson_vector(size_t group_size)
 	build_main_chain_vector(group_size);
 }
 
-size_t	PmergeMe::binary_search_vector(int value, size_t end) const
+size_t	PmergeMe::binary_search_vector(const std::vector<int> &chain, int value, size_t end, size_t group_size) const
 {
 	size_t	mid;
 	size_t	left;
@@ -183,7 +213,7 @@ size_t	PmergeMe::binary_search_vector(int value, size_t end) const
 	while (left < right)
 	{
 		mid = left + (right - left) / 2;
-		if (value < vector[mid])
+		if (value < chain[mid * group_size + group_size - 1])
 			right = mid;
 		else
 			left = mid + 1;
