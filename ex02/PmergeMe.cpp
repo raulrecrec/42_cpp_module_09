@@ -6,7 +6,7 @@
 /*   By: rexposit <rexposit@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/10/08 20:08:34 by rexposit          #+#    #+#             */
-/*   Updated: 2026/10/10 18:44:10 by rexposit         ###   ########.fr       */
+/*   Updated: 2026/10/13 06:03:45 by rexposit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,68 @@ void	PmergeMe::swap_vector_groups(size_t first, size_t second, size_t group_size
 	}
 }
 
+struct	PendingGroup
+{
+	std::vector<int>	group;
+	int					partner;
+	bool				has_partner;
+};
+
+void	PmergeMe::build_main_chain_vector(size_t group_size)
+{
+	std::vector<int>			main_chain;
+	std::vector<PendingGroup>	pending;
+	PendingGroup				aux;
+	size_t						group_count;
+	size_t						i;
+	size_t						j;
+	
+
+	group_count = 0;
+	i = 0;
+	while (i + group_size <= vector.size())
+	{
+		if (i < group_size || group_count % 2 != 0)
+		{
+			j = 0;
+			while (j < group_size)
+			{
+				main_chain.push_back(vector[i + j]);
+				j++;
+			}
+			group_count++;
+		}
+		else
+		{
+			j = 0;
+			while (j < group_size)
+			{
+				aux.group.push_back(vector[i + j]);
+				j++;
+			}
+			if (i + 2 * group_size <= vector.size())
+			{
+				aux.partner = vector[i + 2 * group_size - 1];
+				aux.has_partner = true;
+			}
+			else
+				aux.has_partner = false;
+			pending.push_back(aux);
+			aux.group.clear();
+			group_count++;
+		}
+		i = i + group_size;
+	}
+
+	std::vector<int>	leftover;
+
+	while (i < vector.size())
+	{
+		leftover.push_back(vector[i]);
+		i++;
+	}
+}
+
 void	PmergeMe::ford_johnson_vector(size_t group_size)
 {
 	if (vector.size() < 2 * group_size)
@@ -106,6 +168,7 @@ void	PmergeMe::ford_johnson_vector(size_t group_size)
 	}
 
 	ford_johnson_vector(group_size * 2);
+	build_main_chain_vector(group_size);
 }
 
 size_t	PmergeMe::binary_search_vector(int value, size_t end) const
