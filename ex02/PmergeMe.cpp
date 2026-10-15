@@ -6,7 +6,7 @@
 /*   By: rexposit <rexposit@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/10/08 20:08:34 by rexposit          #+#    #+#             */
-/*   Updated: 2026/10/15 05:36:47 by rexposit         ###   ########.fr       */
+/*   Updated: 2026/10/15 05:49:43 by rexposit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -217,6 +217,148 @@ void	PmergeMe::build_main_chain_vector(size_t group_size)
 	vector.insert(vector.end(), leftover.begin(), leftover.end());
 }
 
+void	PmergeMe::swap_deque_groups(size_t first, size_t second, size_t group_size)
+{
+	int		aux;
+	size_t	i;
+
+	i = 0;
+	while (i < group_size)
+	{
+		aux = deque[first + i];
+		deque[first + i] = deque[second + i];
+		deque[second + i] = aux;
+		i++;
+	}
+}
+
+size_t	PmergeMe::binary_search_deque(const std::deque<int> &chain, int value, size_t end, size_t group_size) const
+{
+	size_t	mid;
+	size_t	left;
+	size_t	right;
+
+	left = 0;
+	right = end;
+
+	while (left < right)
+	{
+		mid = left + (right - left) / 2;
+		if (value < chain[mid * group_size + group_size - 1])
+			right = mid;
+		else
+			left = mid + 1;
+	}
+
+	return (left);
+}
+
+void	PmergeMe::insert_pending_deque(const std::deque<PendingDequeGroup> &pending, std::deque<int> &main_chain, size_t group_size)
+{
+	size_t	i;
+	size_t	j;
+	size_t	end;
+	size_t	position;
+	size_t	previous;
+	size_t	next;
+	size_t	current;
+	bool	found;
+
+	previous = 1;
+	current = 3;
+	while (previous <= pending.size())
+	{
+		i = std::min(current - 2, pending.size() - 1);
+		while (i >= previous - 1)
+		{
+			j = 0;
+			found = false;
+			end = main_chain.size() / group_size;
+			if (pending[i].has_partner)
+			{
+				while (j < main_chain.size())
+				{
+					if (main_chain[j + group_size - 1] == pending[i].partner)
+					{
+						end = j / group_size;
+						found = true;
+						break ;
+					}
+					j = j + group_size;
+				}
+				if (!found)
+					throw std::logic_error("Partner group not found");
+			}
+			position = binary_search_deque(main_chain, pending[i].group[group_size - 1], end, group_size);
+			main_chain.insert(main_chain.begin() + position * group_size, pending[i].group.begin(), pending[i].group.end());
+			if (i == previous - 1)
+				break ;
+			i--;
+		}
+		next = current + 2 * previous;
+		previous = current;
+		current = next;
+	}
+}
+
+void	PmergeMe::build_main_chain_deque(size_t group_size)
+{
+	std::deque<int>				main_chain;
+	std::deque<PendingDequeGroup>	pending;
+	PendingDequeGroup				aux;
+	size_t							group_count;
+	size_t							i;
+	size_t							j;
+
+	group_count = 0;
+	i = 0;
+	while (i + group_size <= deque.size())
+	{
+		if (i < group_size || group_count % 2 != 0)
+		{
+			j = 0;
+			while (j < group_size)
+			{
+				main_chain.push_back(deque[i + j]);
+				j++;
+			}
+			group_count++;
+		}
+		else
+		{
+			j = 0;
+			while (j < group_size)
+			{
+				aux.group.push_back(deque[i + j]);
+				j++;
+			}
+			if (i + 2 * group_size <= deque.size())
+			{
+				aux.partner = deque[i + 2 * group_size - 1];
+				aux.has_partner = true;
+			}
+			else
+				aux.has_partner = false;
+			pending.push_back(aux);
+			aux.group.clear();
+			group_count++;
+		}
+		i = i + group_size;
+	}
+
+	std::deque<int>	leftover;
+
+	while (i < deque.size())
+	{
+		leftover.push_back(deque[i]);
+		i++;
+	}
+
+	insert_pending_deque(pending, main_chain, group_size);
+	deque = main_chain;
+	deque.insert(deque.end(), leftover.begin(), leftover.end());
+}
+
 void	PmergeMe::parse_arguments(int argc, char **argv)
 {
 	if (argc < 2)
@@ -256,9 +398,33 @@ void	PmergeMe::ford_johnson_vector(size_t group_size)
 	build_main_chain_vector(group_size);
 }
 
+void	PmergeMe::ford_johnson_deque(size_t group_size)
+{
+	if (deque.size() < 2 * group_size)
+		return ;
+
+	size_t	i;
+
+	i = 0;
+	while (i + 2 * group_size <= deque.size())
+	{
+		if (deque[i + group_size - 1] > deque[i + 2 * group_size - 1])
+			swap_deque_groups(i, i + group_size, group_size);
+		i = i + 2 * group_size;
+	}
+
+	ford_johnson_deque(group_size * 2);
+	build_main_chain_deque(group_size);
+}
+
 void	PmergeMe::sort_vector()
 {
 	ford_johnson_vector(1);
+}
+
+void	PmergeMe::sort_deque()
+{
+	ford_johnson_deque(1);
 }
 
 void	PmergeMe::print_vector_deque() const

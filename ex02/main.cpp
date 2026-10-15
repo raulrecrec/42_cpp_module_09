@@ -6,7 +6,7 @@
 /*   By: rexposit <rexposit@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/10/08 20:12:12 by rexposit          #+#    #+#             */
-/*   Updated: 2026/10/15 05:37:31 by rexposit         ###   ########.fr       */
+/*   Updated: 2026/10/15 05:51:27 by rexposit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,9 @@ int	main(int argc, char **argv)
 	{
 		sorter.parse_arguments(argc, argv);
 		sorter.sort_vector();
+		sorter.sort_deque();
 	}
-	catch(const std::exception &e)
+	catch (const std::exception &e)
 	{
 		std::cerr << e.what() << std::endl;
 		return (1);
