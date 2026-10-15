@@ -6,7 +6,7 @@
 /*   By: rexposit <rexposit@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/10/08 20:08:37 by rexposit          #+#    #+#             */
-/*   Updated: 2026/10/15 03:46:58 by rexposit         ###   ########.fr       */
+/*   Updated: 2026/10/15 05:39:25 by rexposit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,20 @@ class	PmergeMe
 		std::vector<int>	vector;
 		std::deque<int>		deque;
 
+		struct	PendingVectorGroup
+		{
+			std::vector<int>	group;
+			int					partner;
+			bool				has_partner;
+		};
+
 		int		parse_number(const std::string &argument) const;
+
 		void	swap_vector_groups(size_t first, size_t second, size_t group_size);
+		size_t	binary_search_vector(const std::vector<int> &chain, int value, size_t end, size_t group_size) const;
+		void	insert_pending_vector(const std::vector<PendingVectorGroup> &pending, std::vector<int> &main_chain, size_t group_size);
 		void	build_main_chain_vector(size_t group_size);
+		void	ford_johnson_vector(size_t group_size);
 
 	public:
 		PmergeMe();
@@ -33,10 +44,9 @@ class	PmergeMe
 		PmergeMe	&operator=(const PmergeMe &other);
 		~PmergeMe();
 
-		size_t	binary_search_vector(const std::vector<int> &chain, int value, size_t end, size_t group_size) const;
 		void	parse_arguments(int argc, char ** argv);
+		void	sort_vector();
 		void	print_vector_deque() const;
-		void	ford_johnson_vector(size_t group_size);
 };
 
 #endif
