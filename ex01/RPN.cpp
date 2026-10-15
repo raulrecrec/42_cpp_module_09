@@ -6,7 +6,7 @@
 /*   By: rexposit <rexposit@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/10/07 14:57:45 by rexposit          #+#    #+#             */
-/*   Updated: 2026/10/07 17:00:23 by rexposit         ###   ########.fr       */
+/*   Updated: 2026/10/16 00:23:08 by rexposit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include <cctype>
 #include <stdexcept>
 #include <cstdlib>
+#include <climits>
 #include <iostream>
 
 RPN::RPN()
@@ -39,16 +40,27 @@ RPN::~RPN()
 {
 }
 
-int	RPN::calculate(int left, int right, const char symbol) const
+int RPN::calculate(int left, int right, const char symbol) const
 {
+	long long result;
+
 	if (symbol == '+')
-		return (left + right);
-	if (symbol == '-')
-		return (left - right);
-	if (symbol == '/')
-		return (left / right);
+		result = static_cast<long long>(left) + right;
+	else if (symbol == '-')
+		result = static_cast<long long>(left) - right;
+	else if (symbol == '/')
+	{
+		if (right == 0)
+			throw std::runtime_error("Error");
+		result = static_cast<long long>(left) / right;
+	}
 	else
-		return (left * right);
+		result = static_cast<long long>(left) * right;
+
+	if (result > INT_MAX || result < INT_MIN)
+		throw std::runtime_error("Error");
+
+	return (static_cast<int>(result));
 }
 
 void	RPN::apply_operation(const char symbol)
