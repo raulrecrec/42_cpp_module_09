@@ -6,7 +6,7 @@
 /*   By: rexposit <rexposit@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/10/08 20:08:34 by rexposit          #+#    #+#             */
-/*   Updated: 2026/10/13 23:11:18 by rexposit         ###   ########.fr       */
+/*   Updated: 2026/10/15 03:43:01 by rexposit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,33 +153,49 @@ void	PmergeMe::build_main_chain_vector(size_t group_size)
 
 	size_t	end;
 	size_t	position;
+	size_t	previous;
+	size_t	next;
+	size_t	current;
 	bool	found;
 
-	i = 0;
-	while (i < pending.size())
+	previous = 1;
+	current = 3;
+	while (previous <= pending.size())
 	{
-		j = 0;
-		found = false;
-		end = main_chain.size() / group_size;
-		if (pending[i].has_partner)
+		i = std::min(current - 2, pending.size() - 1);
+		while (i >= previous - 1)
 		{
-			while (j < main_chain.size())
+			j = 0;
+			found = false;
+			end = main_chain.size() / group_size;
+			if (pending[i].has_partner)
 			{
-				if (main_chain[j + group_size - 1] == pending[i].partner)
+				while (j < main_chain.size())
 				{
-					end = j / group_size;
-					found = true;
-					break ;
+					if (main_chain[j + group_size - 1] == pending[i].partner)
+					{
+						end = j / group_size;
+						found = true;
+						break ;
+					}
+					j = j + group_size;
 				}
-				j = j + group_size;
+				if (!found)
+					throw std::logic_error("Partner group not found");
 			}
-			if (!found)
-				throw std::logic_error("Partner group not found");
+			position = binary_search_vector(main_chain, pending[i].group[group_size - 1], end, group_size);
+			main_chain.insert(main_chain.begin() + position * group_size, pending[i].group.begin(), pending[i].group.end());
+			if (i == previous - 1)
+				break ;
+			i--;
 		}
-		position = binary_search_vector(main_chain, pending[i].group[group_size - 1], end, group_size);
-		main_chain.insert(main_chain.begin() + position * group_size, pending[i].group.begin(), pending[i].group.end());
-		i++;
+		next = current + 2 * previous;
+		previous = current;
+		current = next;
 	}
+
+	vector = main_chain;
+	vector.insert(vector.end(), leftover.begin(), leftover.end());
 }
 
 void	PmergeMe::ford_johnson_vector(size_t group_size)
