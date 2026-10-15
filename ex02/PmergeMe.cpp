@@ -6,7 +6,7 @@
 /*   By: rexposit <rexposit@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/10/08 20:08:34 by rexposit          #+#    #+#             */
-/*   Updated: 2026/10/15 05:49:43 by rexposit         ###   ########.fr       */
+/*   Updated: 2026/10/15 06:55:14 by rexposit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,12 +20,12 @@
 #include <iostream>
 
 PmergeMe::PmergeMe()
-	: vector(), deque()
+	: numbers(), vector(), deque()
 {
 }
 
 PmergeMe::PmergeMe(const PmergeMe &other)
-	: vector(other.vector), deque(other.deque)
+	: numbers(other.numbers), vector(other.vector), deque(other.deque)
 {
 }
 
@@ -33,6 +33,7 @@ PmergeMe	&PmergeMe::operator=(const PmergeMe &other)
 {
 	if (this != &other)
 	{
+		this->numbers = other.numbers;
 		this->vector = other.vector;
 		this->deque = other.deque;
 	}
@@ -371,10 +372,9 @@ void	PmergeMe::parse_arguments(int argc, char **argv)
 	while (i < argc)
 	{
 		value = parse_number(argv[i]);
-		if (std::find(vector.begin(), vector.end(), value) != vector.end())
+		if (std::find(numbers.begin(), numbers.end(), value) != numbers.end())
 			throw std::runtime_error("Error");
-		vector.push_back(value);
-		deque.push_back(value);
+		numbers.push_back(value);
 		i++;
 	}
 }
@@ -419,34 +419,24 @@ void	PmergeMe::ford_johnson_deque(size_t group_size)
 
 void	PmergeMe::sort_vector()
 {
+	vector.assign(numbers.begin(), numbers.end());
 	ford_johnson_vector(1);
 }
 
 void	PmergeMe::sort_deque()
 {
+	deque.assign(numbers.begin(), numbers.end());
 	ford_johnson_deque(1);
 }
 
-void	PmergeMe::print_vector_deque() const
+void	PmergeMe::print_sorted() const
 {
-	std::cout << "Vector:" << std::endl;
-
 	size_t	i;
 
 	i = 0;
 	while (i < vector.size())
 	{
 		std::cout << vector[i] << " ";
-		i++;
-	}
-	std::cout << std::endl;
-
-	std::cout << "Deque:" << std::endl;
-
-	i = 0;
-	while (i < deque.size())
-	{
-		std::cout << deque[i] << " ";
 		i++;
 	}
 	std::cout << std::endl;

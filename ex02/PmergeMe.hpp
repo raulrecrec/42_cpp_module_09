@@ -6,7 +6,7 @@
 /*   By: rexposit <rexposit@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/10/08 20:08:37 by rexposit          #+#    #+#             */
-/*   Updated: 2026/10/15 05:44:50 by rexposit         ###   ########.fr       */
+/*   Updated: 2026/10/15 06:56:06 by rexposit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 class	PmergeMe
 {
 	private:
+		std::vector<int>	numbers;
 		std::vector<int>	vector;
 		std::deque<int>		deque;
 
@@ -60,7 +61,7 @@ class	PmergeMe
 		void	parse_arguments(int argc, char ** argv);
 		void	sort_vector();
 		void	sort_deque();
-		void	print_vector_deque() const;
+		void	print_sorted() const;
 };
 
 #endif
